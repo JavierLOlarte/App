@@ -19,7 +19,8 @@ async function ejecutarComando() {
     }
 
     
-    const comando = `yo intergrupo-builder ${projectName} f ${loginChecked} webangular13 ${dbChecked} theme1`;
+    //const comando = `yo intergrupo-builder ${projectName} f ${loginChecked} webangular13 ${dbChecked} theme1`;
+    const comando = `yo intergrupo-builder ${projectName} mo kotlin200 webangular13 ${dbChecked} theme1`
 
     try {
         const respuesta = await fetch("http://localhost:5000/execute", {
@@ -39,6 +40,5 @@ async function ejecutarComando() {
         alert("Error al conectar con el servidor:\n" + error.message);
     }
 }
-
 
 document.getElementById("btnEjecutar").addEventListener("click", ejecutarComando);
