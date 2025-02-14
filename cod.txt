@@ -1,0 +1,91 @@
+'use strict';
+const Generator = require('yeoman-generator');
+const chalk = require('chalk');
+const constants = require('../generator-constants');
+const jsonConverter = require('../../utility/jsonConverter');
+
+module.exports = class extends Generator {
+  constructor(args, opts) {
+    super(args, opts);
+    this.argument('applicationName', {
+      type: String,
+      required: true,
+      desc: 'Nombre de la aplicación'
+    });
+    this.argument('applicationType', {
+      type: String,
+      required: true,
+      desc: 'Tipo de aplicación Front (f) Back (b)'
+    });
+    this.argument('technology', {
+      type: String,
+      required: true,
+      desc: 'Tecnologia de la app (webangular13, webangular14, dotnet6Abp)'
+    });
+    this.argument('licenseKey', {
+      type: String,
+      required: false,
+      desc: 'License Key for ABP projects'
+    });
+  }
+
+  prompting() {
+    // SWO Logotype
+    this._printSwoLogo();
+  }
+
+  writing() {
+    try {
+      // Archivo de Entidades Resultante
+      var entitiesMaster = jsonConverter.xmlToJson(
+        this.destinationPath(),
+        constants.APPLICATION_ENTITIES_FILE
+      );
+
+      if (this.options.applicationType === 'f') {
+        this.composeWith(require.resolve('../app-frontend'), {
+          applicationName: this.options.applicationName,
+          applicationEntitiesMaster: constants.APPLICATION_ENTITIES_FILE,
+          entitiesMaster: entitiesMaster,
+          frontType: this.options.technology
+        });
+      }
+
+      if (this.options.applicationType === 'b') {
+        this.composeWith(require.resolve('../app-backend'), {
+          applicationName: this.options.applicationName,
+          applicationEntitiesMaster: constants.APPLICATION_ENTITIES_FILE,
+          entitiesMaster: entitiesMaster,
+          backType: this.options.technology,
+          licenseKey: this.options.licenseKey
+        });
+      }
+
+      if (this.options.applicationType === 'm') {
+        this.composeWith(require.resolve('../app-microservice'), {
+          applicationName: this.options.applicationName,
+          applicationEntitiesMaster: constants.APPLICATION_ENTITIES_FILE,
+          entitiesMaster: entitiesMaster,
+          backType: this.options.technology
+        });
+      }
+
+      if (this.options.applicationType === 'mo') {
+        console.log('Entra a mo '+ this.options.technology);
+        this.composeWith(require.resolve('../app-mobile'), {
+          applicationName: this.options.applicationName,
+          applicationEntitiesMaster: constants.APPLICATION_ENTITIES_FILE,
+          entitiesMaster: entitiesMaster,
+          frontType: this.options.technology
+        });
+      }
+    } catch (Exception) {
+      this.log(
+        chalk.yellow(
+          'Verifíque los archivos de entrada del proyecto y vuelva a Intentarlo'
+        )
+      );
+      this.log(chalk.yellow(Exception));
+      this.log(chalk.red('*** Se ha abortado el proceso de generación del proyecto ***'));
+    }
+  }
