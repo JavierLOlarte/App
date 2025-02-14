@@ -20,7 +20,7 @@ async function ejecutarComando() {
 
     
     //const comando = `yo intergrupo-builder ${projectName} f ${loginChecked} webangular13 ${dbChecked} theme1`;
-    const comando = `yo intergrupo-builder ${projectName} mo kotlin200 webangular13 ${dbChecked} theme1`
+    const comando = `yo intergrupo-builder:app-backend ${projectName} mo kotlin200 webangular13 ${dbChecked} theme1`
 
     try {
         const respuesta = await fetch("http://localhost:5000/execute", {
