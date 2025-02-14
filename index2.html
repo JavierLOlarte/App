@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Proyecto</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <div id="app" class="bg-white shadow-lg rounded-xl p-6 w-full max-w-lg">
+    <h2 class="text-2xl font-bold text-gray-700 text-center mb-4">Generador de Proyecto</h2>
+
+    <!-- Nombre del Proyecto -->
+    <div class="mb-4">
+      <label class="block text-gray-600 font-medium">Nombre del Proyecto:</label>
+      <input type="text" v-model="projectName" placeholder="Ingrese nombre del proyecto"
+        class="w-full mt-2 p-2 border rounded-md focus:ring focus:ring-blue-300">
+    </div>
+
+    <!-- Opciones de Herramientas -->
+    <div class="mb-4">
+      <h3 class="text-lg font-semibold text-gray-700">Herramientas</h3>
+      <div class="flex items-center mt-2 space-x-4">
+        <label class="flex items-center">
+          <input type="checkbox" v-model="loginChecked" class="mr-2">
+          <span>Login</span>
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" v-model="dbChecked" class="mr-2">
+          <span>Bases de Datos</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Opciones de Orientación -->
+    <div class="mb-4">
+      <h3 class="text-lg font-semibold text-gray-700">Orientación</h3>
+      <div class="flex items-center mt-2 space-x-4">
+        <label class="flex items-center">
+          <input type="radio" v-model="orientation" value="horizontal" class="mr-2">
+          <span>Horizontal</span>
+        </label>
+        <label class="flex items-center">
+          <input type="radio" v-model="orientation" value="vertical" class="mr-2">
+          <span>Vertical</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Botón -->
+    <button @click="ejecutarComando"
+      class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+      Generar Proyecto
+    </button>
+
+    <!-- Mensaje de estado -->
+    <div v-if="mensaje" class="mt-4 p-3 rounded-lg text-center"
+      :class="mensajeError ? 'bg-red-200 text-red-700' : 'bg-green-200 text-green-700'">
+      {{ mensaje }}
+    </div>
+
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+      setup() {
+        const projectName = ref("");
+        const loginChecked = ref(false);
+        const dbChecked = ref(false);
+        const orientation = ref("");
+        const mensaje = ref("");
+        const mensajeError = ref(false);
+
+        const ejecutarComando = async () => {
+          if (!projectName.value.trim()) {
+            mensaje.value = "⚠️ Ingrese un nombre de proyecto.";
+            mensajeError.value = true;
+            return;
+          }
+
+          const loginOption = loginChecked.value ? "login" : "none";
+          const dbOption = dbChecked.value ? "database" : "none";
+          const comando = `yo intergrupo-builder ${projectName.value.trim()} f ${loginOption} webangular13 ${dbOption} theme1`;
+
+          try {
+            const respuesta = await fetch("http://localhost:5000/execute", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ command: comando })
+            });
+
+            const datos = await respuesta.json();
+
+            if (respuesta.ok) {
+              mensaje.value = "✅ Comando ejecutado con éxito: " + datos.output;
+              mensajeError.value = false;
+            } else {
+              mensaje.value = "❌ Error: " + (datos.error || "Desconocido");
+              mensajeError.value = true;
+            }
+          } catch (error) {
+            mensaje.value = "❌ No se pudo conectar con el servidor.";
+            mensajeError.value = true;
+          }
+        };
+
+        return {
+          projectName,
+          loginChecked,
+          dbChecked,
+          orientation,
+          ejecutarComando,
+          mensaje,
+          mensajeError
+        };
+      }
+    }).mount("#app");
+  </script>
+
+</body>
+</html>
