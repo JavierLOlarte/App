@@ -3,7 +3,6 @@ async function ejecutarComando() {
     const loginChecked = document.getElementById("login-option").checked ? "login" : "none";
     const dbChecked = document.getElementById("database-option").checked ? "database" : "none";
     
-
     const orientationOptions = document.getElementsByName("orientation");
     let orientation = "none";
     for (let option of orientationOptions) {
@@ -18,9 +17,7 @@ async function ejecutarComando() {
         return;
     }
 
-    
-    //const comando = `yo intergrupo-builder ${projectName} f ${loginChecked} webangular13 ${dbChecked} theme1`;
-    const comando = `yo intergrupo-builder:app-backend ${projectName} mo kotlin200 webangular13 ${dbChecked} theme1`
+    const comando = `yo intergrupo-builder ${projectName} mo kotlin200 webangular13 ${dbChecked} theme1`;
 
     try {
         const respuesta = await fetch("http://localhost:5000/execute", {
