@@ -12,11 +12,13 @@ def execute_command():
     
     if not command:
         return jsonify(error="No se recibió un comando"), 400
+    
+    target_directory = r"C:\Proyecto\ultima\SWO.Kotlin"
 
     print(f"📢 Ejecutando comando: {command}") 
 
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True,cwd=target_directory)
         print(f"✅ Salida: {result.stdout}") 
         print(f"⚠️ Error (si hay): {result.stderr}")  
         return jsonify(output=result.stdout, error=result.stderr)
